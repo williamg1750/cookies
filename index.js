@@ -25,7 +25,12 @@ const session = require('express-session');
 //   console.log(req.cookies);
 //   res.send(req.signedCookies);
 // });
-app.use(session({ secret: 'thisisnotagoodsecret' }));
+const sessionOptions = {
+  secret: 'thisisnotagoodsecret',
+  resave: false,
+  saveUninitialized: false,
+};
+app.use(session(sessionOptions));
 
 app.get('/viewcount', (req, res) => {
   if (req.session.count) {
@@ -36,6 +41,17 @@ app.get('/viewcount', (req, res) => {
   res.send(`You have viewed this page ${req.session.count} times`);
 });
 
-app.listen(7777, () => {
-  console.log('now listening to port 7777');
+app.get('/register', (req, res) => {
+  const { username = 'anon' } = req.query;
+  req.session.username = username;
+  res.redirect('/greet');
+});
+
+app.get('/greet', (req, res) => {
+  const { username } = req.session;
+  res.send(`Hello  ${username} `);
+});
+
+app.listen(3000, () => {
+  console.log('now listening to port 3000');
 });
